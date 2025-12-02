@@ -1,8 +1,6 @@
 import asyncio
 from playwright.async_api import async_playwright
 
-USERNAME = "placeholder"
-
 async def login_to_ao3():
     async with async_playwright() as p:
 
