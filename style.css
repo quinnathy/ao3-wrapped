@@ -1,0 +1,40 @@
+body {
+  font-family: "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  background-color: #ececec;
+    opacity: 0.8;
+    background-image:  linear-gradient(#cdcdcd 1px, transparent 1px), linear-gradient(to right, #cdcdcd 1px, #ececec 1px);
+    background-size: 20px 20px;
+}
+
+b, strong, i {
+  font-family: "Lucida Sans", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+h2{
+    margin:0
+}
+
+p {
+    margin:0;
+}
+
+.snippet {
+    font-family: "Space Mono", Courier, monospace;
+    border: 1px solid gray;
+    background-color: #f4f4f4;
+    padding: 0px 2px;
+    border-radius: 5px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+    height: 100vh;
+}
+
+.section {
+    background-color: white;
+    padding: 6vh;
+    border-radius: 4vh;
+}
