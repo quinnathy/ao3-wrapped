@@ -1,5 +1,5 @@
 function showPage(targetId, direction = 'left') {
-    const currentActive = document.querySelector('.page-section.active');
+    const currentActive = document.querySelector('.section.active');
     const nextActive = document.getElementById(targetId);
 
     if (!currentActive || !nextActive) return;
@@ -21,17 +21,31 @@ function showPage(targetId, direction = 'left') {
     }, 500); 
 }
 
-
 document.getElementById('json-file').addEventListener('change', handleFileUpload);
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
+    
+    if (!file) {
+        return;
+    }
+    
     const reader = new FileReader();
 
     reader.onload = function(e) {
-        const worksData = JSON.parse(e.target.result);
-        performDataAnalysis(worksData);
+        const jsonText = e.target.result;
+        
+        try {
+            const worksData = JSON.parse(jsonText);
+            
+            performDataAnalysis(worksData);
+        } catch (error) {
+            document.getElementById('results').innerHTML = 
+                `<p style="color: red; font-weight: bold;">Error: The file may be corrupt or not valid JSON.</p>`;
+            console.error("JSON Parsing Error:", error);
+        }
     };
+    
     reader.readAsText(file);
 }
 
@@ -57,24 +71,27 @@ function analyzeTagColumn(df, colName1, colName2, valueKey) {
 }
 
 function performDataAnalysis(data) {
+    let resultsDiv = document.getElementById('results');
+    
+    resultsDiv.innerHTML = `<p style="color: green; font-weight: bold;">✅ Successfully loaded ${data.length} works. Running analysis...</p>`;
+
+
     const df = new dfd.DataFrame(data);
 
     const topFandoms = analyzeTagColumn(df, 'fandoms', null, 'name');
     const topShips = analyzeTagColumn(df, 'tags', 'relationships', 'name');
     const topFreeformTags = analyzeTagColumn(df, 'tags', 'freeforms', 'name');
     
-    let resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = '<h3>Analysis Complete! (Top 5)</h3>';
     
     topFandoms.toString().then(str => {
-        resultsDiv.innerHTML += '<h4>⭐ Fandoms:</h4>' + '<pre>${str}</pre>';
+        resultsDiv.innerHTML += '<h4>⭐ Fandoms:</h4>' + `<pre>${str}</pre>`;
     });
 
     topShips.toString().then(str => {
-        resultsDiv.innerHTML += '<h4>💖 Ships/Relationships:</h4>' + '<pre>${str}</pre>';
+        resultsDiv.innerHTML += '<h4>💖 Ships/Relationships:</h4>' + `<pre>${str}</pre>`;
     });
 
     topFreeformTags.toString().then(str => {
-        resultsDiv.innerHTML += '<h4>🏷️ Freeform Tags:</h4>' + '<pre>${str}</pre>';
+        resultsDiv.innerHTML += '<h4>🏷️ Freeform Tags:</h4>' + `<pre>${str}</pre>`;
     });
 }
