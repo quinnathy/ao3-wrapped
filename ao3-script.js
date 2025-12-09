@@ -61,6 +61,7 @@ function analyzeTagColumn(df, colName1, colName2, valueKey) {
             allValues.push(tagObj[valueKey]);
         });
     });
+    const dfd = require("danfojs-node")
 
     const longDf = new dfd.DataFrame(allValues, { columns: ['ItemName'] });
     const countsDf = longDf.groupby(['ItemName']).count();
@@ -74,7 +75,7 @@ function performDataAnalysis(data) {
     let resultsDiv = document.getElementById('results');
     
     resultsDiv.innerHTML = `<p style="color: green; font-weight: bold;">✅ Successfully loaded ${data.length} works. Running analysis...</p>`;
-
+    const dfd = require("danfojs-node")
 
     const df = new dfd.DataFrame(data);
 
