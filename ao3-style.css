@@ -37,4 +37,24 @@ p {
     background-color: white;
     padding: 6vh;
     border-radius: 4vh;
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; 
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.section.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+.section.slide-in-start {
+    transform: translateX(100%); 
+}
+
+.section.slide-out-end {
+    transform: translateX(-100%);
 }

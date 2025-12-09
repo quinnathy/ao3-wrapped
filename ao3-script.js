@@ -1,3 +1,27 @@
+function showPage(targetId, direction = 'left') {
+    const currentActive = document.querySelector('.page-section.active');
+    const nextActive = document.getElementById(targetId);
+
+    if (!currentActive || !nextActive) return;
+
+    const inClass = (direction === 'left') ? 'slide-in-start' : 'slide-out-end';
+    nextActive.classList.add(inClass);
+
+    currentActive.classList.remove('active');
+    const outClass = (direction === 'left') ? 'slide-out-end' : 'slide-in-start';
+    currentActive.classList.add(outClass);
+
+    void currentActive.offsetWidth;
+
+    nextActive.classList.remove(inClass);
+    nextActive.classList.add('active');
+
+    setTimeout(() => {
+        currentActive.classList.remove(outClass);
+    }, 500); 
+}
+
+
 document.getElementById('json-file').addEventListener('change', handleFileUpload);
 
 function handleFileUpload(event) {

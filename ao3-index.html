@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AO3 History Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/danfojs@latest/dist/index.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ao3-style.css">
 </head>
 <body>
 
     <div class="container">
-        <div class="section">
+
+        <div id="step-1" class="section active">
 
             <p>If you're a Chrome user, copy + paste: <span class="snippet">chrome://extensions/</span></p>
             <p>&#9312; Download this <a href="https://github.com/Zaki-1052/AO3-History-Exporter/archive/refs/heads/main.zip" class="button">package</a> and unzip the folder</p>
@@ -29,13 +30,17 @@
             <p>&#9313; Click "Load Temporary Add-on"</p>
             <p>&#9314; Select any file in the repository folder (i.e. <span class="snippet">manifest.json</span>)</p>
             <br>
-            <p style="text-align: right;">Next >></p>
+            <button onclick="showPage('step-2')">Next</button>
             
+        </div>
+
+        <div id="step-2" class="section">
+            <p>test</p>
         </div>
         
     </div>
     
-    <script src="script.js"></script>
+    <script src="ao3-script.js"></script>
 </body>
 </html>
 
