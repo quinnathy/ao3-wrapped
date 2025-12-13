@@ -21,8 +21,6 @@ function showPage(targetId, direction = 'left') {
     }, 500); 
 }
 
-document.getElementById('json-file').addEventListener('change', handleFileUpload);
-
 function handleFileUpload(event) {
     const file = event.target.files[0];
     
@@ -94,3 +92,16 @@ function performDataAnalysis(data) {
         resultsDiv.innerHTML += '<h4>🏷️ Freeform Tags:</h4>' + `<pre>${str}</pre>`;
     });
 }
+
+
+function initApp() {
+    if (typeof dfd !== 'undefined') {
+        document.getElementById('json-file').addEventListener('change', handleFileUpload);
+        console.log("Danfo.js loaded and application initialized.");
+    } else {
+        console.log("Waiting for Danfo.js to load...");
+        setTimeout(initApp, 100);
+    }
+}
+
+initApp();
