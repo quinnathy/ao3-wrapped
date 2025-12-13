@@ -63,8 +63,9 @@ function analyzeTagColumn(df, colName1, colName2, valueKey) {
     });
 
     if (allValues.length === 0) {
-        return new dfd.DataFrame([['No Data Found', 0]], { columns: ['ItemName', 'ItemName_count'] });
+        return Promise.resolve("No Data Found");
     }
+    
     const longDf = new dfd.DataFrame(allValues, { columns: ['ItemName'] });
     const countsDf = longDf.groupby(['ItemName']).count();
     
@@ -77,26 +78,28 @@ function analyzeTagColumn(df, colName1, colName2, valueKey) {
 function performDataAnalysis(data) {
     let resultsDiv = document.getElementById('results');
     
-    resultsDiv.innerHTML = `<p style="color: green; font-weight: bold;">✅ Successfully loaded ${data.length} works. Running analysis...</p>`;
+    resultsDiv.innerHTML = `<p style="color: green; font-weight: bold;">Successfully loaded ${data.length} works. Running analysis...</p>`;
 
     const df = new dfd.DataFrame(data);
 
-    const topFandoms = analyzeTagColumn(df, 'fandoms', null, 'name');
-    const topShips = analyzeTagColumn(df, 'tags', 'relationships', 'name');
-    const topFreeformTags = analyzeTagColumn(df, 'tags', 'freeforms', 'name');
+    const topFandomsResult = analyzeTagColumn(df, 'fandoms', null, 'name');
+    const topShipsResult = analyzeTagColumn(df, 'tags', 'relationships', 'name');
+    const topFreeformTagsResult = analyzeTagColumn(df, 'tags', 'freeforms', 'name');
     
     
-    topFandoms.toString().then(str => {
-        resultsDiv.innerHTML += '<h4>⭐ Fandoms:</h4>' + `<pre>${str}</pre>`;
-    });
+    const displayResult = (result, title) => {
+        if (typeof result === 'string') {
+            resultsDiv.innerHTML += `<h4>${title}</h4><pre>${result}</pre>`;
+        } else {
+            result.toString().then(str => {
+                resultsDiv.innerHTML += `<h4>${title}</h4><pre>${str}</pre>`;
+            });
+        }
+    };
 
-    topShips.toString().then(str => {
-        resultsDiv.innerHTML += '<h4>💖 Ships/Relationships:</h4>' + `<pre>${str}</pre>`;
-    });
-
-    topFreeformTags.toString().then(str => {
-        resultsDiv.innerHTML += '<h4>🏷️ Freeform Tags:</h4>' + `<pre>${str}</pre>`;
-    });
+    displayResult(topFandomsResult, 'Fandoms:');
+    displayResult(topShipsResult, 'Ships/Relationships:');
+    displayResult(topFreeformTagsResult, 'Freeform Tags:');
 }
 
 
