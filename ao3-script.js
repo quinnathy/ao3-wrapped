@@ -55,9 +55,11 @@ function analyzeTagColumn(df, colName1, colName2, valueKey) {
             list = item[colName2];
         }
         
-        list.forEach(tagObj => {
-            allValues.push(tagObj[valueKey]);
-        });
+        if (list && Array.isArray(list)) {
+            list.forEach(tagObj => {
+                allValues.push(tagObj[valueKey]);
+            });
+        }
     });
 
     const longDf = new dfd.DataFrame(allValues, { columns: ['ItemName'] });
