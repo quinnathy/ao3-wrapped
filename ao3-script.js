@@ -62,6 +62,9 @@ function analyzeTagColumn(df, colName1, colName2, valueKey) {
         }
     });
 
+    if (allValues.length === 0) {
+        return new dfd.DataFrame([['No Data Found', 0]], { columns: ['ItemName', 'ItemName_count'] });
+    }
     const longDf = new dfd.DataFrame(allValues, { columns: ['ItemName'] });
     const countsDf = longDf.groupby(['ItemName']).count();
     
@@ -69,6 +72,7 @@ function analyzeTagColumn(df, colName1, colName2, valueKey) {
     
     return countsDf.head(5);
 }
+
 
 function performDataAnalysis(data) {
     let resultsDiv = document.getElementById('results');
