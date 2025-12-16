@@ -1,116 +1,160 @@
-function showPage(targetId, direction = 'left') {
-    const currentActive = document.querySelector('.section.active');
-    const nextActive = document.getElementById(targetId);
+document.getElementById('json-file').addEventListener('change', handleFileSelect);
 
-    if (!currentActive || !nextActive) return;
+function findMode(array) {
+    if (array.length === 0) {
+        return null;
+    }
 
-    const inClass = (direction === 'left') ? 'slide-in-start' : 'slide-out-end';
-    nextActive.classList.add(inClass);
+    const frequencyMap = {};
+    let maxCount = 0;
+    let mode = '';
 
-    currentActive.classList.remove('active');
-    const outClass = (direction === 'left') ? 'slide-out-end' : 'slide-in-start';
-    currentActive.classList.add(outClass);
+    for (const item of array) {
+        const key = String(item);
+        frequencyMap[key] = (frequencyMap[key] || 0) + 1;
 
-    void currentActive.offsetWidth;
+        if (frequencyMap[key] > maxCount) {
+            maxCount = frequencyMap[key];
+            mode = key;
+        }
+    }
 
-    nextActive.classList.remove(inClass);
-    nextActive.classList.add('active');
-
-    setTimeout(() => {
-        currentActive.classList.remove(outClass);
-    }, 500); 
+    return { value: mode, count: maxCount };
 }
 
-function handleFileUpload(event) {
+function renderTopItems(array, limit, title) {
+    const frequencyMap = {};
+    for (const item of array) {
+        const key = String(item);
+        frequencyMap[key] = (frequencyMap[key] || 0) + 1;
+    }
+
+    const sortedItems = Object.entries(frequencyMap)
+        .sort(([, countA], [, countB]) => countB - countA)
+        .slice(0, limit);
+
+    if (sortedItems.length === 0) {
+        return `<p>${title}: No data found.</p>`;
+    }
+
+    let html = `<h4>${title}</h4><ul class="tag-list">`;
+    html += sortedItems.map(([name, count]) => `<li><span class="count">${count}<span class="tooltiptext">How many fics you read</span></span> ${name}</li>`).join('');
+    html += '</ul>';
+    return html;
+}
+
+function handleFileSelect(event) {
     const file = event.target.files[0];
-    
+    const mainContainer = document.getElementById('step-3'); 
+
+    if (!mainContainer) return; 
+
+    mainContainer.innerHTML = '<p>Processing...</p>';
+
     if (!file) {
+        mainContainer.innerHTML = '<p>No file selected.</p>';
         return;
     }
-    
+
     const reader = new FileReader();
 
-    reader.onload = function(e) {
-        const jsonText = e.target.result;
-        
+    reader.onload = (e) => {
         try {
-            const worksData = JSON.parse(jsonText);
+            const data = JSON.parse(e.target.result);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                mainContainer.innerHTML = `<p style="color: red;">Error: The JSON file is empty or not a valid list (${data.length} works found).</p>`;
+                return;
+            }
+
+            const allRatings = [];
+            const allRelationships = [];
+            const allFreeformTags = [];
+            const allAuthors = [];
+            const allFandoms = [];
+
+            for (const work of data) {
+                if (work.rating) allRatings.push(work.rating);
+                if (work.author) allAuthors.push(work.author);
+
+                const relationships = work.tags?.relationships;
+                if (Array.isArray(relationships)) {
+                    for (const relationship of relationships) {
+                        if (relationship.name) allRelationships.push(relationship.name);
+                    }
+                }
+
+                const freeforms = work.tags?.freeforms;
+                if (Array.isArray(freeforms)) {
+                    for (const freeform of freeforms) {
+                        if (freeform.name) allFreeformTags.push(freeform.name);
+                    }
+                }
+
+                const fandoms = work.fandoms;
+                if (Array.isArray(fandoms)) {
+                    for (const fandom of fandoms) {
+                        if (fandom.name) allFandoms.push(fandom.name);
+                    }
+                }
+            }
+
+            const mostCommonRating = findMode(allRatings);
+            const mostReadRelationship = findMode(allRelationships);
+            const mostReadAuthor = findMode(allAuthors);
+
+            let outputHTML = `<h3>Out of ${data.length} fics read, this is what we found...</h3>`;
             
-            performDataAnalysis(worksData);
+            const renderSingleStat = (mode, label, unit) => {
+                if (!mode) return 'N/A';
+                return `${mode.value} <span class="count">${label} ${mode.count} ${unit}</span>`;
+            };
+            
+            outputHTML += `
+                <div class="results-container">
+                    <div id="top-ship">
+                        You shipped <strong>${mostReadRelationship.value}</strong> the most! (Read ${mostReadRelationship.count} times)
+                    </div>
+                    <div id="top-rating">
+                        You mostly read fics labelled <strong>${mostCommonRating.value}</strong>. (Read ${mostCommonRating.count} times)
+                    </div>
+                    <div id="fave-author">
+                        Your favorite writer was <strong>${mostReadAuthor.value}</strong>! Drop them some extra kudos. (Read ${mostReadAuthor.count} times)
+                    </div>
+                    
+                    <hr>
+                    
+                    <div id="top-fandom">
+                        ${renderTopItems(allFandoms, 5, 'Your top fandoms were')}
+                    </div>
+                    <div id="top-tags">
+                        ${renderTopItems(allFreeformTags, 5, 'These were your favorite tags:')}
+                    </div>
+                    
+                    <hr>
+
+                    <details>
+                        <summary>Other Data Counts (Top 5s)</summary>
+                        ${renderTopItems(allRatings, 5, 'Top 5 Ratings')}
+                        ${renderTopItems(allAuthors, 5, 'Top 5 Authors')}
+                        ${renderTopItems(allFandoms, 5, 'Top 5 Fandoms')}
+                        ${renderTopItems(allRelationships, 5, 'Top 5 Relationships')}
+                        ${renderTopItems(allFreeformTags, 5, 'Top 5 Freeform Tags')}
+                    </details>
+                </div>
+            `;
+
+            mainContainer.innerHTML = outputHTML;
+
         } catch (error) {
-            document.getElementById('results').innerHTML = 
-                `<p style="color: red; font-weight: bold;">Error: The file may be corrupt or not valid JSON.</p>`;
-            console.error("JSON Parsing Error:", error);
+            mainContainer.innerHTML = `<p style="color: red;">Error processing file: ${error.message}</p>`;
+            console.error('Processing error:', error);
         }
     };
-    
+
+    reader.onerror = () => {
+        mainContainer.innerHTML = `<p style="color: red;">Error reading file: ${reader.error.message}</p>`;
+    };
+
     reader.readAsText(file);
 }
-
-function analyzeTagColumn(df, colName1, colName2, valueKey) {
-    let allValues = [];
-    df[colName1].values.forEach(item => {
-        let list = item;
-        if (colName2) {
-            list = item[colName2];
-        }
-        
-        if (list && Array.isArray(list)) {
-            list.forEach(tagObj => {
-                allValues.push(tagObj[valueKey]);
-            });
-        }
-    });
-
-    if (allValues.length === 0) {
-        return Promise.resolve("No Data Found");
-    }
-    
-    const longDf = new dfd.DataFrame(allValues, { columns: ['ItemName'] });
-    const countsDf = longDf.groupby(['ItemName']).count();
-    
-    countsDf.sortValues({ by: 'ItemName_count', ascending: false, inplace: true });
-    
-    return countsDf.head(5);
-}
-
-
-function performDataAnalysis(data) {
-    let resultsDiv = document.getElementById('results');
-    
-    resultsDiv.innerHTML = `<p style="color: green; font-weight: bold;">Successfully loaded ${data.length} works. Running analysis...</p>`;
-
-    const df = new dfd.DataFrame(data);
-
-    const topFandomsResult = analyzeTagColumn(df, 'fandoms', null, 'name');
-    const topShipsResult = analyzeTagColumn(df, 'tags', 'relationships', 'name');
-    const topFreeformTagsResult = analyzeTagColumn(df, 'tags', 'freeforms', 'name');
-    
-    
-    const displayResult = (result, title) => {
-        if (typeof result === 'string') {
-            resultsDiv.innerHTML += `<h4>${title}</h4><pre>${result}</pre>`;
-        } else {
-            result.toString().then(str => {
-                resultsDiv.innerHTML += `<h4>${title}</h4><pre>${str}</pre>`;
-            });
-        }
-    };
-
-    displayResult(topFandomsResult, 'Fandoms:');
-    displayResult(topShipsResult, 'Ships/Relationships:');
-    displayResult(topFreeformTagsResult, 'Freeform Tags:');
-}
-
-
-function initApp() {
-    if (typeof dfd !== 'undefined') {
-        document.getElementById('json-file').addEventListener('change', handleFileUpload);
-        console.log("Danfo.js loaded and application initialized.");
-    } else {
-        console.log("Waiting for Danfo.js to load...");
-        setTimeout(initApp, 100);
-    }
-}
-
-initApp();

@@ -35,20 +35,48 @@
         </div>
 
         <div id="step-2" class="section">
-            <p>Please upload the <span class="snippet">ao3_history.json</span> file you downloaded.</p>
-            
-            <label for="json-file" style="font-weight: bold; display: block; margin: 15px 0 5px;">
+            <label for="json-file" style="font-weight: bold; display: block; margin: 0 0 5px;">
                 Select JSON File:
             </label>
             <input type="file" id="json-file" accept=".json">
-
-            <div id="results" style="margin-top: 20px;">
-            </div>
+            <br><br>
+            <button onclick="showPage('step-1')">Go back</button>
+            <button onclick="showPage('step-3')">Next</button>
+            
         </div>
-        
+
+        <div id="step-3" class="section">
+            <p>Did you forget something?</p><br>
+            <button onclick="showPage('step-2')">Oh yeah lol</button>
+        </div>
+
     </div>
     
    <script src="ao3-script.js" defer></script>
+   <script>
+    function showPage(targetId, direction = 'left') {
+    const currentActive = document.querySelector('.section.active');
+    const nextActive = document.getElementById(targetId);
+
+    if (!currentActive || !nextActive) return;
+
+    const inClass = (direction === 'left') ? 'slide-in-start' : 'slide-out-end';
+    nextActive.classList.add(inClass);
+
+    currentActive.classList.remove('active');
+    const outClass = (direction === 'left') ? 'slide-out-end' : 'slide-in-start';
+    currentActive.classList.add(outClass);
+
+    void currentActive.offsetWidth;
+
+    nextActive.classList.remove(inClass);
+    nextActive.classList.add('active');
+
+    setTimeout(() => {
+        currentActive.classList.remove(outClass);
+    }, 500); 
+    }   
+    </script>
 </body>
 </html>
 

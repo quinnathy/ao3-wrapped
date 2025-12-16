@@ -1,18 +1,20 @@
 body {
-  font-family: "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
-  background-color: #ececec;
-    opacity: 0.8;
-    background-image:  linear-gradient(#cdcdcd 1px, transparent 1px), linear-gradient(to right, #cdcdcd 1px, #ececec 1px);
+  font-family: "Noto Sans", Verdana, sans-serif;
+  background-color: #970000;
+    opacity:1;
+    background-image:  linear-gradient(#680606 1px, transparent 1px), linear-gradient(to right, #750404 1px, #970000 1px);
     background-size: 20px 20px;
 }
 
 b, strong, i {
-  font-family: "Lucida Sans", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family:  "Noto Sans", Verdana, sans-serif;
 }
 
 h2{
     margin:0
 }
+
+h3 {margin-top:0;}
 
 p {
     margin:0;
@@ -36,7 +38,7 @@ p {
 .section {
     background-color: white;
     padding: 6vh;
-    border-radius: 4vh;
+    border-radius: 2vh;
     position: absolute;
     opacity: 0;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; 
@@ -57,4 +59,39 @@ p {
 
 .section.slide-out-end {
     transform: translateX(-100%);
+}
+
+.tag-list {
+    list-style-type: none; 
+    padding-left: 0;
+}
+
+.count {
+    font-family: "Calibri", sans-serif;
+    background-color: #15508b;
+    color: white;
+    padding: 0px 3px;
+    border-radius: 3vh;
+    font-size: 0.9rem;
+    position: relative;
+     display: inline-block;
+     width: 30px;
+     text-align: center;
+}
+
+.count:hover .tooltiptext {
+    visibility: visible;
+}
+
+.tooltiptext {
+  visibility: hidden; 
+  width: max-content;
+  font-family: "Calibri", sans-serif;
+  background-color: black;
+  color: #ffffff;
+  text-align: center;
+  padding: 0 0.5vh 0.3vh 0.5vh;
+  position: absolute;
+  z-index: 1; 
+  opacity: 0.8;
 }
